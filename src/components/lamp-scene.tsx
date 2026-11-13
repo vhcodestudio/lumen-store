@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { kelvinToHex, type Finish, type Shape } from "@/lib/catalog";
@@ -111,6 +111,18 @@ function Lamp({ shape, finish, on, kelvin }: LampProps) {
   );
 }
 
+/** Widens the vertical FOV on portrait screens so tall lamps stay in frame. */
+function ResponsiveFov() {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    const aspect = size.width / size.height;
+    cam.fov = aspect < 1 ? Math.min(62, 38 / Math.max(aspect, 0.55) * 0.85) : 38;
+    cam.updateProjectionMatrix();
+  }, [camera, size]);
+  return null;
+}
+
 function Room({ on, kelvin }: { on: boolean; kelvin: number }) {
   return (
     <>
@@ -126,13 +138,14 @@ function Room({ on, kelvin }: { on: boolean; kelvin: number }) {
 }
 
 export default function LampScene({ shape, finish, on, kelvin, interactive = true, className = "" }: LampProps & { interactive?: boolean; className?: string }) {
-  const cam: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 4.4], desk: [1.2, 1.6, 3.6], arc: [0, 2.2, 5.6], globe: [0, 1.2, 3] };
-  const target: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 0], desk: [0, 0.9, 0], arc: [0, 1.5, 0], globe: [0, 0.6, 0] };
+  const cam: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 4.4], desk: [1.4, 1.7, 4.4], arc: [0, 2.2, 5.6], globe: [0, 1.2, 3] };
+  const target: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 0], desk: [0, 1.1, 0], arc: [0, 1.5, 0], globe: [0, 0.6, 0] };
   return (
     <Canvas shadows dpr={[1, 1.75]} camera={{ position: cam[shape], fov: 38 }} className={className} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
       aria-label={`Modelo 3D da luminária, ${on ? "acesa" : "apagada"}`} role="img">
       <color attach="background" args={["#0f0d0b"]} />
       <fog attach="fog" args={["#0f0d0b", 6, 12]} />
+      <ResponsiveFov />
       <Room on={on} kelvin={kelvin} />
       <Lamp shape={shape} finish={finish} on={on} kelvin={kelvin} />
       <OrbitControls target={target[shape]} enablePan={false} enableZoom={interactive} enableRotate={interactive} minDistance={2.2} maxDistance={8}
