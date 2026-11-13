@@ -117,6 +117,8 @@ function ResponsiveFov() {
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const aspect = size.width / size.height;
+    // R3F idiom: the camera is a mutable three.js object, not React state
+    // eslint-disable-next-line react-hooks/immutability
     cam.fov = aspect < 1 ? Math.min(62, 38 / Math.max(aspect, 0.55) * 0.85) : 38;
     cam.updateProjectionMatrix();
   }, [camera, size]);
