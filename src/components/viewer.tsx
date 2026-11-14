@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { brl, kelvinToHex, type Product } from "@/lib/catalog";
 import { useCart } from "./cart";
@@ -90,6 +90,25 @@ export function ProductStudio({ product }: { product: Product }) {
           </dl>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Collection card 3D: mounts when the card scrolls near, pauses rendering when it leaves. */
+export function CardLamp({ product }: { product: Product }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [seen, setSeen] = useState(false);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { setVisible(e.isIntersecting); if (e.isIntersecting) setSeen(true); }, { rootMargin: "200px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="absolute inset-0">
+      {seen && <LampScene shape={product.shape} finish={product.finishes[0]} on kelvin={2700} interactive={false} paused={!visible} className="!h-full" />}
     </div>
   );
 }

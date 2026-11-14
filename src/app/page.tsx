@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { products, brl } from "@/lib/catalog";
-import { HeroLamp } from "@/components/viewer";
+import { CardLamp, HeroLamp } from "@/components/viewer";
 
 export default function Home() {
   return (
@@ -30,8 +30,7 @@ export default function Home() {
             <li key={p.slug} className={i % 2 ? "sm:mt-24" : ""}>
               <Link href={`/p/${p.slug}`} className="group block">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[2px] bg-night-2">
-                  <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.04]"
-                    style={{ background: `radial-gradient(45% 38% at 50% ${p.shape === "pendant" ? 38 : p.shape === "arc" ? 30 : 55}%, #ffd59a 0, #ffb46b55 25%, transparent 70%), radial-gradient(70% 50% at 50% 100%, ${p.finishes[0].color}33, transparent)` }} />
+                  <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.04]"><CardLamp product={p} /></div>
                   <span className="absolute left-5 top-5 text-xs uppercase tracking-[0.3em] text-dim">{String(i + 1).padStart(2, "0")} · {p.line}</span>
                   <span className="absolute bottom-5 right-5 rounded-full border border-line bg-night/60 px-3 py-1 text-xs backdrop-blur transition-colors group-hover:border-glow group-hover:text-glow">Ver em 3D →</span>
                 </div>

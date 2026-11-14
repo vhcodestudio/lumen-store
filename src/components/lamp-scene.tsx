@@ -125,7 +125,7 @@ function ResponsiveFov() {
   return null;
 }
 
-function Room({ on, kelvin }: { on: boolean; kelvin: number }) {
+function Room({ on }: { on: boolean }) {
   return (
     <>
       <ambientLight intensity={on ? 0.08 : 0.22} />
@@ -134,21 +134,21 @@ function Room({ on, kelvin }: { on: boolean; kelvin: number }) {
         <circleGeometry args={[6, 64]} />
         <meshStandardMaterial color="#1b1814" roughness={0.9} />
       </mesh>
-      <ContactShadows position={[0, 0.005, 0]} opacity={0.6} scale={6} blur={2.4} far={3} color={on ? kelvinToHex(kelvin) : "#000"} />
+      <ContactShadows frames={1} resolution={256} position={[0, 0.005, 0]} opacity={0.55} scale={6} blur={2.4} far={3} color="#000" />
     </>
   );
 }
 
-export default function LampScene({ shape, finish, on, kelvin, interactive = true, className = "" }: LampProps & { interactive?: boolean; className?: string }) {
+export default function LampScene({ shape, finish, on, kelvin, interactive = true, paused = false, className = "" }: LampProps & { interactive?: boolean; paused?: boolean; className?: string }) {
   const cam: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 4.4], desk: [1.4, 1.7, 4.4], arc: [0, 2.2, 5.6], globe: [0, 1.2, 3] };
   const target: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 0], desk: [0, 1.1, 0], arc: [0, 1.5, 0], globe: [0, 0.6, 0] };
   return (
-    <Canvas shadows dpr={[1, 1.75]} camera={{ position: cam[shape], fov: 38 }} className={className} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
+    <Canvas frameloop={paused ? "never" : "always"} dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: cam[shape], fov: 38 }} className={className} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
       aria-label={`Modelo 3D da luminária, ${on ? "acesa" : "apagada"}`} role="img">
       <color attach="background" args={["#0f0d0b"]} />
       <fog attach="fog" args={["#0f0d0b", 6, 12]} />
       <ResponsiveFov />
-      <Room on={on} kelvin={kelvin} />
+      <Room on={on} />
       <Lamp shape={shape} finish={finish} on={on} kelvin={kelvin} />
       <OrbitControls target={target[shape]} enablePan={false} enableZoom={interactive} enableRotate={interactive} minDistance={2.2} maxDistance={8}
         minPolarAngle={0.3} maxPolarAngle={Math.PI / 2.05} autoRotate={!interactive} autoRotateSpeed={0.6} />
