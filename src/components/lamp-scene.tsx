@@ -139,12 +139,12 @@ function Room({ on }: { on: boolean }) {
   );
 }
 
-export default function LampScene({ shape, finish, on, kelvin, interactive = true, paused = false, className = "" }: LampProps & { interactive?: boolean; paused?: boolean; className?: string }) {
+export default function LampScene({ shape, finish, on, kelvin, interactive = true, paused = false, className = "", label }: LampProps & { interactive?: boolean; paused?: boolean; className?: string; label?: string }) {
   const cam: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 4.4], desk: [1.4, 1.7, 4.4], arc: [0, 2.2, 5.6], globe: [0, 1.2, 3] };
   const target: Record<Shape, [number, number, number]> = { pendant: [0, 1.25, 0], desk: [0, 1.1, 0], arc: [0, 1.5, 0], globe: [0, 0.6, 0] };
   return (
     <Canvas frameloop={paused ? "never" : "always"} dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: cam[shape], fov: 38 }} className={className} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
-      aria-label={`Modelo 3D da luminária, ${on ? "acesa" : "apagada"}`} role="img">
+      aria-label={label ?? `Modelo 3D da luminária, ${on ? "acesa" : "apagada"}`} role="img">
       <color attach="background" args={["#0f0d0b"]} />
       <fog attach="fog" args={["#0f0d0b", 6, 12]} />
       <ResponsiveFov />
