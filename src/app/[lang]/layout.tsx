@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Bodoni_Moda, Manrope } from "next/font/google";
+import { LangLink } from "@/components/lang-link";
 import { CartProvider, CartButton } from "@/components/cart";
-import { dicts, href, htmlLang, isLang, langLabel, LANGS, type Lang } from "@/lib/i18n";
+import { dicts, href, htmlLang, isLang, LANGS, type Lang } from "@/lib/i18n";
 import "../globals.css";
 
 const display = Bodoni_Moda({ variable: "--font-bodoni", subsets: ["latin"], style: ["normal", "italic"] });
@@ -46,7 +48,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
               <nav aria-label={d.nav.label} className="flex items-center gap-4 text-sm sm:gap-6">
                 <Link href={`${href(lang)}#colecao`} className="hidden hover:text-glow sm:inline">{d.nav.collection}</Link>
                 <Link href={`${href(lang)}#atelie`} className="hidden hover:text-glow sm:inline">{d.nav.atelier}</Link>
-                <LangSwitch lang={lang} label={d.nav.language} />
+                <Suspense fallback={<span className="min-w-24" />}><LangSwitch lang={lang} label={d.nav.language} /></Suspense>
                 <CartButton />
               </nav>
             </div>
@@ -70,10 +72,7 @@ function LangSwitch({ lang, label }: { lang: Lang; label: string }) {
       {LANGS.map((l) => (
         <li key={l}>
           {/* Plain links: switching language reloads the page in that language (the bag is kept). */}
-          <a href={href(l)} hrefLang={htmlLang[l]} lang={htmlLang[l]} title={langLabel[l]} aria-current={l === lang ? "page" : undefined}
-            className={`inline-grid min-h-8 min-w-8 place-items-center px-1 ${l === lang ? "text-glow" : "text-dim hover:text-ivory"}`}>
-            <span aria-hidden="true">{l}</span><span className="sr-only">{langLabel[l]}</span>
-          </a>
+          <LangLink to={l} current={lang} className={`inline-grid min-h-8 min-w-8 place-items-center px-1 ${l === lang ? "text-glow" : "text-dim hover:text-ivory"}`} />
         </li>
       ))}
     </ul>
